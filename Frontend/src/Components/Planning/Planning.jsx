@@ -14,7 +14,7 @@ const Planning = () => {
   const [results, setResults] = useState(null); 
   const [loading, setLoading] = useState(false);
 
-  // handle input change
+  // handling input change
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -22,7 +22,7 @@ const Planning = () => {
     });
   };
 
-  // handle form submit
+  // handling form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("User travel preferences:", formData);
@@ -30,19 +30,19 @@ const Planning = () => {
     setLoading(true);
 
     try {
-      // ✅ call FastAPI endpoint
+      //  calling FastAPI endpoint
       const response = await fetch("http://127.0.0.1:8000/recommendations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           budget: formData.budget,
-          time: formData.duration, // match FastAPI field
+          time: formData.duration, // matching FastAPI field
           mood: formData.mood,
         }),
       });
 
       const data = await response.json();
-      setResults(data); // ✅ store backend suggestions
+      setResults(data); //  storing backend suggestions
     } catch (error) {
       console.error("Error fetching results:", error);
       setResults({ error: "Failed to fetch travel suggestions. Try again." });
@@ -131,25 +131,30 @@ const Planning = () => {
         </button>
       </form>
 
-      {/* ✅ Results Box */}
-      {results && (
-        <div className="results-box">
-          <h2>🌍 Suggested Travel Plan</h2>
-          {results.error ? (
-            <p style={{ color: "red" }}>{results.error}</p>
-          ) : results.places && results.places.length > 0 ? (
-            <ul>
-              {results.places.map((place, index) => (
-                <li key={index}>
-                  <strong>{place.name}</strong> – {place.description} ({place.cost})
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No results found. Try different preferences.</p>
-          )}
-        </div>
-      )}
+{/*  Results Box */}
+{results && (
+  <div className="results-box">
+    <h2>🌍 Suggested Travel Places</h2>
+    {results.error ? (
+      <p style={{ color: "red" }}>{results.error}</p>
+    ) : results.places && results.places.length > 0 ? (
+      <ul>
+        {results.places.map((place, index) => (
+          <li key={index}>
+            <strong>{place.name}, {place.country}</strong><br />
+            Categories: {place.categories.join(", ")}<br />
+            {/* Best Time: {place.best_time_to_travel.join(", ")}<br />
+            Estimated Cost: {place.estimated_cost}<br /> */}
+            Safety: {place.safety_status}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No results found. Try different preferences.</p>
+    )}
+  </div>
+)}
+
     </div>
   );
 };

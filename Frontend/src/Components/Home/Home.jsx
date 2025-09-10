@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 import About from '../About/About';
+import Safety from '../Safety/Safety.jsx';
 import "./Home.css";
 
 const Home = () => {
@@ -23,10 +24,16 @@ const Home = () => {
         </Link>
       </div>
 
+    
+     <div className='safety'>
+        <Safety />
+      </div>
 
       <div className='about'>
         <About/>
       </div>
+
+      
     </div>
   )
 }

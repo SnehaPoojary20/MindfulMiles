@@ -1,0 +1,87 @@
+.safety-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.form-container input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+}
+
+.form-container button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #0077ff;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.form-container button:hover {
+  background-color: #005ecc;
+}
+
+.results-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.place-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.place-card h2 {
+  margin: 0 0 10px;
+}
+
+.safety-score {
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-top: 8px;
+  text-align: center;
+  background-color: greenyellow;
+}
+
+/* Color coding */
+.safety-good {
+  background-color: #d4edda; 
+  color: #155724;
+}
+
+.safety-medium {
+  background-color: #fff3cd; 
+  color: #856404;
+}
+
+.safety-bad {
+  background-color: #f8d7da; 
+  color: #721c24;
+}
+
+.safety-unknown {
+  background-color: #e2e3e5; 
+  color: #383d41;
+}
+

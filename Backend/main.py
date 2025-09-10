@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import ast
+from city_safety import get_safety_status  
 
 app = FastAPI()
 
@@ -15,55 +16,65 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# User input model
-class UserInput(BaseModel):
-    budget: str  # currently optional; you can use later
-    time: str    # month, e.g., 'may'
-    mood: str    # adventure, relax, cultural, nightlife, foodie
 
-# Load cleaned dataset
+# User Input Model for Recommendations
+class TravelRequest(BaseModel):
+    budget: int
+    time: int
+    mood: str
+
+# Load Travel Dataset Once
 df = pd.read_csv("cleaned_travel_dataset.csv")
 
-# Convert string representations of lists back to actual lists
-df["category"] = df["category"].apply(ast.literal_eval)
-df["best_time_to_travel"] = df["best_time_to_travel"].apply(ast.literal_eval)
+# Convert string lists back into Python lists
+df["category"] = df["category"].apply(lambda x: ast.literal_eval(x) if x else [])
+df["best_time_to_travel"] = df["best_time_to_travel"].apply(lambda x: ast.literal_eval(x) if x else [])
 
-# Map moods to dataset category keywords
-mood_map = {
-    "adventure": ["adventure", "hiking", "rafting", "trekking", "skiing", "sports"],
-    "relax": ["beach", "spa", "resorts", "nature", "backwaters"],
-    "cultural": ["history", "culture", "museums", "art", "temples", "landmarks"],
-    "nightlife": ["nightlife", "clubs", "bars"],
-    "foodie": ["food", "restaurants", "cuisine"]
-}
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello, FastAPI is working!"}
-
+# Recommendations Endpoint
 @app.post("/recommendations")
-def get_recommendations(input: UserInput):
-    mood_keywords = mood_map.get(input.mood.lower(), [])
+async def recommendations(req: TravelRequest):
+    mood = req.mood.lower()
 
-    # Filter dataset based on mood categories and travel month
-    filtered = df[
-        df["category"].apply(lambda cats: any(k in cats for k in mood_keywords)) &
-        df["best_time_to_travel"].apply(lambda months: input.time.lower() in months)
-    ]
+    # Simple filter: checking if mood matches category
+    def mood_match(categories, mood):
+        mood_map = {
+            "adventure": ["adventure", "hiking", "sports", "nature", "skiing"],
+            "relax": ["beach", "relaxation", "spa", "nature", "coastline"],
+            "cultural": ["culture", "history", "museums", "art", "temples", "landmarks"]
+        }
+        keywords = mood_map.get(mood, [])
+        return any(k.lower() in [c.lower() for c in categories] for k in keywords)
 
-    # Prepare results as a list of dictionaries
-    results = []
+    # Filtering dataset by mood
+    filtered = df[df['category'].apply(lambda cats: mood_match(cats, mood))]
+
+    # Building response
+    places_list = []
     for _, row in filtered.iterrows():
-        results.append({
-            "name": row["city"],
-            "country": row["country"],
-            "categories": row["category"],
-            "best_time_to_travel": row["best_time_to_travel"],
-            "estimated_cost": row.get("estimated_cost", "N/A")
+        places_list.append({
+            "name": row['city'],
+            "country": row['country'],
+            "categories": row['category'],
+            "best_time_to_travel": row['best_time_to_travel'],  # keeping actual data if available
+            "estimated_cost": "₹Unknown",  # can add real estimates later
+            "safety_status": get_safety_status(row['city'])     
         })
 
-    return {"places": results}
+    return {"places": places_list}
 
 
+# Safety Endpoint 
+@app.get("/safety/{city}")
+def get_safety(city: str):
+    try:
+        status = get_safety_status(city)  # Safe / Neutral / Unsafe / Unknown
+        return {"city": city, "safety_status": status}
+    except Exception as e:
+        return {"city": city, "safety_status": "Unknown", "error": str(e)}
 
-#python -m uvicorn main:app --reload
+# Root Endpoint
+@app.get("/")
+def read_root():
+    return {"message": "API running with Travel Recommendations + Safety!"}
+

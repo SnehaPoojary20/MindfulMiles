@@ -7,6 +7,7 @@
   text-align: center;
   color: white;
   padding: 20px;
+   margin-top: 10%;
 }
 
 .home h1 {
@@ -15,8 +16,7 @@
   line-height: 1.4;
   word-spacing: 8px; 
   margin-bottom: 20px;
-  margin-top: 20%;
-}
+  }
 
 .intro h1 {
   margin-top: 10%;
@@ -24,7 +24,7 @@
 
 .startPlanning{
     margin-top: 20%;
-    margin-bottom: 10%;
+    margin-bottom: 20%;
 }
 
 .startPlanning h1 {
@@ -50,4 +50,13 @@
   background-color: #adff2f;
   box-shadow: 0px 6px 15px gold;
   transform: translateY(-3px); /* lift effect */
+}
+
+.safety{
+  /* margin-top: 20%; */
+  margin-bottom: 20%;
+}
+
+.about{
+  margin-bottom: 10%;
 }
